@@ -60,6 +60,9 @@
     <Compile Include="Models\DataModel.cs" />
     <Compile Include="Models\RecordModel.cs" />
     <Compile Include="Extension.cs" />
+    <Compile Include="Repositories\RecordRepository.cs" />
+    <Compile Include="Repositories\IRecordRepository.cs" />
+    <Compile Include="Repositories\Models\RecordModelDAO.cs" />
     <Compile Include="Utility\ImageCompress.cs" />
     <Compile Include="Views\Imageform.cs">
       <SubType>Form</SubType>
