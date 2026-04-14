@@ -1,5 +1,8 @@
 ﻿using AccountingBook.Attributes;
+using AccountingBook.Contracts;
 using AccountingBook.Models;
+using AccountingBook.Models.DTO;
+using AccountingBook.Repositories.Models;
 using CSVLibrary;
 using System;
 using System.Collections.Generic;
@@ -14,11 +17,14 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static AccountingBook.Contracts.SearchRecordContract;
 
 namespace AccountingBook.Views
 {
-    public partial class 記帳本 : Form
+    public partial class 記帳本 : Form, ISearchRecordView
+
     {
+        private SearchRecordPresenter presenter;
         public 記帳本()
         {
             InitializeComponent();
@@ -31,7 +37,7 @@ namespace AccountingBook.Views
             //DataGridViewColumn(行) =>  先透過反射，抓取目標物件的所有公開屬性來創建Column, 創建的Column為 DataGridViewTextboxColumn
             //DataGridViewRow(列) => 跑迴圈將每一筆資料都建立DataGridViewRow
             //DataGridViewCell(欄) => 建立在Row底下的每一格Cell,每一格的Cell都會有OwningColumn來去表示他所對應的Column,如果是TextboxColumn,那就會創建對應的 TextboxCell
-
+            presenter = new SearchRecordPresenter(this);
             dataGridView1.CellEndEdit += DataGridView1_CellEndEdit;
         }
 
@@ -114,30 +120,7 @@ namespace AccountingBook.Views
             this.Debounce(() =>
             {
                 DisposeGridImages();
-
-                DateTime startDate = startDateTimePicker.Value.Date;
-                DateTime endDate = endDateTimePicker.Value.Date;
-
-                TimeSpan timeSpan = endDate - startDate;
-                int days = timeSpan.Days;
-                string rootFolder = @"C:\\Users\\bukut\\Desktop\\C#課程\\記帳本資料";
-
-                recordList = new List<RecordModel>();
-
-                for (int i = 0; i <= days; i++)
-                {
-                    string dateFolder = rootFolder + "\\" + startDate.AddDays(i).ToString("yyyy-MM-dd");
-                    string filePath = dateFolder + "\\date.csv";
-
-                    if (File.Exists(filePath))
-                    {
-                        List<RecordModel> oneDayList = CSVHelper.Read<RecordModel>(filePath);
-                        recordList.AddRange(oneDayList);
-                    }
-                }
-
-                BuildColumns();
-                LoadOldData();
+                presenter.SearchRecords(startDateTimePicker.Value.Date, endDateTimePicker.Value.Date);
 
             }, 400);
 
@@ -158,34 +141,34 @@ namespace AccountingBook.Views
                 recordList[e.RowIndex].Detail = detailList[0];
 
             }
-            string oneDate = recordList[e.RowIndex].Date;
 
-            List<RecordModel> oneDayList = recordList.Where(x => x.Date == oneDate).ToList();
-
-            string rootFolder = @"C:\\Users\\bukut\\Desktop\\C#課程\\記帳本資料";
-            string dateFolder = rootFolder + "\\" + oneDate;
-            string filePath = dateFolder + "\\date.csv";
-
-
-            if (File.Exists(filePath))
+            // 交給 Presenter 處理
+            RecordModel model = recordList[e.RowIndex];
+            SearchRecordModelDTO dTO = new SearchRecordModelDTO
             {
-                File.Delete(filePath);
-            }
-            CSVHelper.Write<RecordModel>(filePath, oneDayList);
+                Date = model.Date,
+                Amount = model.Amount,
+                Category = model.Category,
+                Detail = model.Detail,
+                Target = model.Target,
+                Payment = model.Payment,
+                ImagePath1 = model.ImagePath1,
+                ImagePath2 = model.ImagePath2,
+
+            };
+            presenter.UpdateRecord(dTO);
 
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0)
-            {
-                return;
-            }
 
             RecordModel model = recordList[e.RowIndex];
 
-            if (dataGridView1.Columns[e.ColumnIndex].Name == "ImagePath1_Image")
+            if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex] is DataGridViewImageCell imagecell && imagecell.OwningColumn.Name != "ImagePath3_Image")
             {
+                string propName = imagecell.OwningColumn.Tag.ToString();
+                string imagePath = (string)typeof(RecordModel).GetProperty(propName).GetValue(model);
                 string bigFileName1 = model.ImagePath1.Replace("small_", "");
                 if (File.Exists(bigFileName1))
                 {
@@ -193,63 +176,24 @@ namespace AccountingBook.Views
                     imageform.ShowDialog();
                 }
             }
-            else if (dataGridView1.Columns[e.ColumnIndex].Name == "ImagePath2_Image")
-            {
-                string bigFileName2 = model.ImagePath2.Replace("small_", "");
-                if (File.Exists(bigFileName2))
-                {
-                    Imageform imageform = new Imageform(bigFileName2);
-                    imageform.ShowDialog();
-                }
 
-            }
             else if (dataGridView1.Columns[e.ColumnIndex].Name == "ImagePath3_Image")
             {
 
-                if (model.ImagePath1 != "" && File.Exists(model.ImagePath1))
+                // 交給 Presenter 處理
+                SearchRecordModelDTO dTO = new SearchRecordModelDTO
                 {
-                    File.Delete(model.ImagePath1);
-                }
-                if (model.ImagePath2 != "" && File.Exists(model.ImagePath2))
-                {
-                    File.Delete(model.ImagePath2);
-                }
+                    Date = model.Date,
+                    Amount = model.Amount,
+                    Category = model.Category,
+                    Detail = model.Detail,
+                    Target = model.Target,
+                    Payment = model.Payment,
+                    ImagePath1 = model.ImagePath1,
+                    ImagePath2 = model.ImagePath2,
 
-                string bigFileName1 = model.ImagePath1.Replace("small_", "");
-                string bigFileName2 = model.ImagePath2.Replace("small_", "");
-
-                if (bigFileName1 != "" && File.Exists(bigFileName1))
-                {
-                    File.Delete(bigFileName1);
-                }
-
-                if (bigFileName2 != "" && File.Exists(bigFileName2))
-                {
-                    File.Delete(bigFileName2);
-                }
-
-                string oneDate = model.Date;
-                recordList.RemoveAt(e.RowIndex);
-
-                List<RecordModel> oneDayList = recordList.Where(x => x.Date == oneDate).ToList();
-
-                string rootFolder = @"C:\\Users\\bukut\\Desktop\\C#課程\\記帳本資料";
-                string dateFolder = rootFolder + "\\" + oneDate;
-                string filePath = dateFolder + "\\date.csv";
-
-                if (oneDayList.Count > 0)
-                {
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                    }
-                    CSVHelper.Write<RecordModel>(filePath, oneDayList);
-                }
-                else
-                {
-
-                    Directory.Delete(dateFolder, true);
-                }
+                };
+                presenter.DeleteRecord(dTO);
 
                 //HW: 刪除資料的時候，同時也要將圖片進行移除, 提示: MemoryStream
                 BuildColumns();
@@ -271,6 +215,29 @@ namespace AccountingBook.Views
                     });
 
             }
+        }
+
+        void ISearchRecordView.ShowRecords(List<SearchRecordModelDTO> records) //DTO -> RecordModel
+        {
+            recordList = new List<RecordModel>();
+
+            foreach (SearchRecordModelDTO dto in records)
+            {
+                RecordModel recordModel = new RecordModel
+                {
+                    Date = dto.Date,
+                    Amount = dto.Amount,
+                    Category = dto.Category,
+                    Detail = dto.Detail,
+                    Target = dto.Target,
+                    Payment = dto.Payment,
+                    ImagePath1 = dto.ImagePath1,
+                    ImagePath2 = dto.ImagePath2,
+                };
+                recordList.Add(recordModel);
+            }
+            BuildColumns();
+            LoadOldData();
         }
     }
 }

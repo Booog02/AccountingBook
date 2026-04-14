@@ -16,18 +16,19 @@ namespace AccountingBook.Repositories
         private string rootFolder = @"C:\\Users\\bukut\\Desktop\\C#課程\\記帳本資料";
         public void Add(RecordModelDAO record)
         {
+            string dataFolder = Path.Combine(rootFolder, record.Date);
             string filePath = Path.Combine(rootFolder, record.Date, "date.csv");
-            if (!Directory.Exists(filePath))
+            if (!Directory.Exists(dataFolder))
             {
-                Directory.CreateDirectory(filePath);
+                Directory.CreateDirectory(dataFolder);
             }
-            CSVHelper.Write(filePath + "\\date.csv", record);
+            CSVHelper.Write(filePath, record);
         }
 
         public void Delete(RecordModelDAO record)
         {
 
-
+            string dataFolder = Path.Combine(rootFolder, record.Date);
             string filePath = Path.Combine(rootFolder, record.Date, "date.csv");
             List<RecordModelDAO> oneDayList = GetRecordsByDate(DateTime.Parse(record.Date));
             oneDayList.RemoveAll(x => x.ImagePath1 == record.ImagePath1);
@@ -39,7 +40,7 @@ namespace AccountingBook.Repositories
             }
             else
             {
-                Directory.Delete(filePath, true);
+                Directory.Delete(dataFolder, true);
             }
 
         }

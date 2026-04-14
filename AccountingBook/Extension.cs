@@ -78,6 +78,7 @@ namespace AccountingBook
             column.HeaderText = headerText;
             column.DataPropertyName = propName;
             column.DataSource = dataSource;
+            column.Tag = propName;
             dataGridView.Columns.Add(column);
             dataGridView.Columns[propName].Visible = false;
         }
@@ -89,7 +90,7 @@ namespace AccountingBook
             imageColumn.Name = propName + "_Image";
             imageColumn.HeaderText = headerText;
             imageColumn.ImageLayout = DataGridViewImageCellLayout.Zoom;
-
+            imageColumn.Tag = propName;
             dataGridView.Columns.Add(imageColumn);
             dataGridView.Columns[propName].Visible = false;
         }
