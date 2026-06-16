@@ -18,7 +18,7 @@ namespace AccountingBook
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.Run(SingletonForm.GetForm("記一筆"));
+            Application.Run(SingletonForm.GetForm("帳戶分析"));
 
             //56k數據機 撥接網路
             //ADSL 非對稱式數位網路 (下載/上傳)

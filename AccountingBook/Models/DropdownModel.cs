@@ -11,5 +11,6 @@ namespace AccountingBook.Models
         public List<string> Categories { get; set; }
         public List<string> Targets { get; set; }
         public List<string> Payments { get; set; }
+        Dictionary<string, List<string>> TypeDetails { get; set; }
     }
 }

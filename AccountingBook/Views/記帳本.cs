@@ -3,6 +3,7 @@ using AccountingBook.Contracts;
 using AccountingBook.Models;
 using AccountingBook.Models.DTO;
 using AccountingBook.Repositories.Models;
+using AccountingBook.Utility;
 using CSVLibrary;
 using System;
 using System.Collections.Generic;
@@ -129,6 +130,8 @@ namespace AccountingBook.Views
 
         private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            RecordModel model = recordList[e.RowIndex];
+
             string editedValue = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
 
             if (dataGridView1.Columns[e.ColumnIndex].Name == "Category_ComboBox")
@@ -142,20 +145,7 @@ namespace AccountingBook.Views
 
             }
 
-            // 交給 Presenter 處理
-            RecordModel model = recordList[e.RowIndex];
-            SearchRecordModelDTO dTO = new SearchRecordModelDTO
-            {
-                Date = model.Date,
-                Amount = model.Amount,
-                Category = model.Category,
-                Detail = model.Detail,
-                Target = model.Target,
-                Payment = model.Payment,
-                ImagePath1 = model.ImagePath1,
-                ImagePath2 = model.ImagePath2,
-
-            };
+            SearchRecordModelDTO dTO = Mapper.Map<RecordModel, SearchRecordModelDTO>(model);
             presenter.UpdateRecord(dTO);
 
         }
@@ -181,18 +171,7 @@ namespace AccountingBook.Views
             {
 
                 // 交給 Presenter 處理
-                SearchRecordModelDTO dTO = new SearchRecordModelDTO
-                {
-                    Date = model.Date,
-                    Amount = model.Amount,
-                    Category = model.Category,
-                    Detail = model.Detail,
-                    Target = model.Target,
-                    Payment = model.Payment,
-                    ImagePath1 = model.ImagePath1,
-                    ImagePath2 = model.ImagePath2,
-
-                };
+                SearchRecordModelDTO dTO = Mapper.Map<RecordModel, SearchRecordModelDTO>(model);
                 presenter.DeleteRecord(dTO);
 
                 //HW: 刪除資料的時候，同時也要將圖片進行移除, 提示: MemoryStream
@@ -217,25 +196,36 @@ namespace AccountingBook.Views
             }
         }
 
+        // 0414 HW: 嘗試使用AutoMapper的套件轉換
+
         void ISearchRecordView.ShowRecords(List<SearchRecordModelDTO> records) //DTO -> RecordModel
         {
-            recordList = new List<RecordModel>();
 
-            foreach (SearchRecordModelDTO dto in records)
-            {
-                RecordModel recordModel = new RecordModel
-                {
-                    Date = dto.Date,
-                    Amount = dto.Amount,
-                    Category = dto.Category,
-                    Detail = dto.Detail,
-                    Target = dto.Target,
-                    Payment = dto.Payment,
-                    ImagePath1 = dto.ImagePath1,
-                    ImagePath2 = dto.ImagePath2,
-                };
-                recordList.Add(recordModel);
-            }
+            //recordList = new List<RecordModel>();
+            //foreach (SearchRecordModelDTO dto in records)
+            //{
+            //    RecordModel recordModel = new RecordModel
+            //    {
+            //        Date = dto.Date,
+            //        Amount = dto.Amount,
+            //        Category = dto.Category,
+            //        Detail = dto.Detail,
+            //        Target = dto.Target,
+            //        Payment = dto.Payment,
+            //        ImagePath1 = dto.ImagePath1,
+            //        ImagePath2 = dto.ImagePath2,
+            //    };
+            //    recordList.Add(recordModel);
+            //}
+
+            //var config = new MapperConfiguration(cfg =>
+            //{
+            //    cfg.CreateMap<SearchRecordModelDTO, RecordModel>();
+            //});
+            //var mapper = config.CreateMapper();
+            //recordList = mapper.Map<List<RecordModel>>(records);
+
+            recordList = Mapper.Map<List<SearchRecordModelDTO>, List<RecordModel>>(records);
             BuildColumns();
             LoadOldData();
         }

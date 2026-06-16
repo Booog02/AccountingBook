@@ -3,6 +3,7 @@ using AccountingBook.Models.DTO;
 using AccountingBook.Repositories;
 using AccountingBook.Repositories.Models;
 using AccountingBook.Utility;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static AccountingBook.Contracts.AddRecordContract;
+using Mapper = AccountingBook.Utility.Mapper;
 
 namespace AccountingBook.Contracts
 {
@@ -79,18 +81,17 @@ namespace AccountingBook.Contracts
                 bigBitmap2.Dispose();
             }
 
-            RecordModelDAO recordModel = new RecordModelDAO
-            {
-                Date = record.Date,
-                Amount = record.Amount,
-                Category = record.Category,
-                Detail = record.Detail,
-                Target = record.Target,
-                Payment = record.Payment,
-                ImagePath1 = saveImagePath1,
-                ImagePath2 = saveImagePath2,
+            //var config = new MapperConfiguration(cfg => cfg.CreateMap<RecordModelDTO, RecordModelDAO>()
+            //            .ForMember(x => x.ImagePath1, y => y.MapFrom(o => saveImagePath1))
+            //            .ForMember(x => x.ImagePath2, y => y.MapFrom(o => saveImagePath2))
+            //);
+            //var mapper = config.CreateMapper();
 
-            };
+            RecordModelDAO recordModel = Mapper.Map<RecordModelDTO, RecordModelDAO>(record, cfg =>
+            {
+                cfg.ForMember(x => x.ImagePath1, y => y.MapFrom(o => saveImagePath1));
+                cfg.ForMember(x => x.ImagePath2, y => y.MapFrom(o => saveImagePath2));
+            });
             recordRepository.Add(recordModel);
         }
 

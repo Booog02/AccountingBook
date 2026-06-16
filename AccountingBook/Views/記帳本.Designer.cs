@@ -41,31 +41,31 @@
             // navbar1
             // 
             this.navbar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.navbar1.Location = new System.Drawing.Point(0, 481);
+            this.navbar1.Location = new System.Drawing.Point(0, 601);
             this.navbar1.Margin = new System.Windows.Forms.Padding(1);
             this.navbar1.Name = "navbar1";
-            this.navbar1.Size = new System.Drawing.Size(880, 70);
+            this.navbar1.Size = new System.Drawing.Size(1173, 88);
             this.navbar1.TabIndex = 0;
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(69, 92);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridView1.Location = new System.Drawing.Point(92, 115);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 27;
-            this.dataGridView1.Size = new System.Drawing.Size(751, 346);
+            this.dataGridView1.Size = new System.Drawing.Size(1001, 432);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1_CellEndEdit);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(746, 35);
-            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Location = new System.Drawing.Point(995, 44);
+            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 30);
+            this.button1.Size = new System.Drawing.Size(100, 38);
             this.button1.TabIndex = 2;
             this.button1.Text = "查詢";
             this.button1.UseVisualStyleBackColor = true;
@@ -74,40 +74,44 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(80, 44);
+            this.label1.Location = new System.Drawing.Point(107, 55);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 12);
+            this.label1.Size = new System.Drawing.Size(71, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "開始日期:";
             // 
             // startDateTimePicker
             // 
-            this.startDateTimePicker.Location = new System.Drawing.Point(151, 37);
+            this.startDateTimePicker.Location = new System.Drawing.Point(201, 46);
+            this.startDateTimePicker.Margin = new System.Windows.Forms.Padding(4);
             this.startDateTimePicker.Name = "startDateTimePicker";
-            this.startDateTimePicker.Size = new System.Drawing.Size(200, 22);
+            this.startDateTimePicker.Size = new System.Drawing.Size(265, 25);
             this.startDateTimePicker.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(401, 44);
+            this.label2.Location = new System.Drawing.Point(535, 55);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 12);
+            this.label2.Size = new System.Drawing.Size(71, 15);
             this.label2.TabIndex = 3;
             this.label2.Text = "結束日期:";
             // 
             // endDateTimePicker
             // 
-            this.endDateTimePicker.Location = new System.Drawing.Point(472, 37);
+            this.endDateTimePicker.Location = new System.Drawing.Point(629, 46);
+            this.endDateTimePicker.Margin = new System.Windows.Forms.Padding(4);
             this.endDateTimePicker.Name = "endDateTimePicker";
-            this.endDateTimePicker.Size = new System.Drawing.Size(200, 22);
+            this.endDateTimePicker.Size = new System.Drawing.Size(265, 25);
             this.endDateTimePicker.TabIndex = 4;
             // 
             // 記帳本
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(880, 551);
+            this.ClientSize = new System.Drawing.Size(1173, 689);
             this.Controls.Add(this.endDateTimePicker);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.startDateTimePicker);
@@ -115,10 +119,11 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.navbar1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "記帳本";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "記帳本";
+            this.Load += new System.EventHandler(this.記帳本_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
