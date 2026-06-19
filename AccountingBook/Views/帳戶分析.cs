@@ -18,7 +18,7 @@ namespace AccountingBook.Views
     public partial class 帳戶分析 : Form, IAnalysisRecordView
     {
         private AnalysisPresenter presenter;
-
+        //private bool isUpdating = false;
         public 帳戶分析()
         {
 
@@ -46,7 +46,11 @@ namespace AccountingBook.Views
         private void 帳戶分析_Load(object sender, EventArgs e)
         {
             CreateChekcBoxes();
+            CreateFilterCheckBoxes("對象", presenter.GetTargets());
+            CreateFilterCheckBoxes("支付方式", presenter.GetPayments());
         }
+
+
 
         private void CreateChekcBoxes()
         {
@@ -75,7 +79,7 @@ namespace AccountingBook.Views
 
         private void GroupCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            CheckBox groupCheckBbox = sender as CheckBox;
+            CheckBox groupCheckBbox = (CheckBox)sender;
             if (groupCheckBbox == null)
             {
                 return;
@@ -90,6 +94,7 @@ namespace AccountingBook.Views
                 else
                 {
                     ClearGroupCheckBoxes("類型");
+                    flowLayoutPanel2.Controls.Clear();
                 }
             }
             else if (groupCheckBbox.Text == "對象")
@@ -101,6 +106,8 @@ namespace AccountingBook.Views
                 else
                 {
                     ClearGroupCheckBoxes("對象");
+                    flowLayoutPanel2.Controls.Clear();
+
 
                 }
             }
@@ -113,34 +120,51 @@ namespace AccountingBook.Views
                 else
                 {
                     ClearGroupCheckBoxes("支付方式");
+                    flowLayoutPanel2.Controls.Clear();
+
 
                 }
             }
 
+
         }
         private void CreateGroupCheckBoxes(string groupName, List<string> items)
         {
+
             ClearGroupCheckBoxes(groupName);
             FlowLayoutPanel panel = new FlowLayoutPanel();
             panel.Name = groupName;
-            panel.AutoSize = true;
+            panel.Width = flowLayoutPanel1.Width;
+            panel.Height = 40;
             panel.FlowDirection = FlowDirection.LeftToRight;
             panel.BorderStyle = BorderStyle.FixedSingle;
-            panel.Width = flowLayoutPanel1.Width;
+
+
+            CheckBox selectAllCheckBox = new CheckBox();
+            selectAllCheckBox.Text = "全選";
+            selectAllCheckBox.AutoSize = true;
+            selectAllCheckBox.Tag = false;
+            selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
+            panel.Controls.Add(selectAllCheckBox);
+
             foreach (string item in items)
             {
                 CheckBox checkBox = new CheckBox();
                 checkBox.Text = item;
                 checkBox.AutoSize = true;
+                checkBox.Tag = false;
                 if (groupName == "類型")
                 {
                     checkBox.CheckedChanged += TypeCategoryCheckBox_CheckedChanged;
                 }
+                checkBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
                 panel.Controls.Add(checkBox);
             }
             flowLayoutPanel1.Controls.Add(panel);
 
         }
+
+
         private void ClearGroupCheckBoxes(string groupName)
         {
             foreach (Control control in flowLayoutPanel1.Controls)
@@ -158,7 +182,7 @@ namespace AccountingBook.Views
         // Tips: 可以使用 Tag 暫存資料
         private void TypeCategoryCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            CheckBox categoryCheckBox = sender as CheckBox;
+            CheckBox categoryCheckBox = (CheckBox)sender;
             if (categoryCheckBox == null)
             {
                 return;
@@ -186,6 +210,46 @@ namespace AccountingBook.Views
             }
 
         }
+        private void CreateFilterCheckBoxes(string category, List<string> items)
+        {
+            for (int i = 0; i < flowLayoutPanel2.Controls.Count; i++)
+            {
+                if (flowLayoutPanel2.Controls[i].Name == category)
+                {
+                    return;
+                }
+            }
+            FlowLayoutPanel panel = new FlowLayoutPanel();
+            panel.Name = category;
+            panel.Width = flowLayoutPanel2.Width;
+            panel.Height = 35;
+            panel.FlowDirection = FlowDirection.LeftToRight;
+            panel.BorderStyle = BorderStyle.FixedSingle;
+
+            CheckBox selectAllCheckBox = new CheckBox();
+            selectAllCheckBox.Text = "全選";
+            selectAllCheckBox.AutoSize = true;
+            selectAllCheckBox.Tag = false;
+
+            selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
+            panel.Controls.Add(selectAllCheckBox);
+
+
+            foreach (string item in items)
+            {
+                CheckBox checkBox = new CheckBox();
+                checkBox.Text = item;
+                checkBox.AutoSize = true;
+                checkBox.Tag = false;
+
+                checkBox.CheckedChanged += DetailCheckBox_CheckedChanged;
+
+
+                panel.Controls.Add(checkBox);
+            }
+            flowLayoutPanel2.Controls.Add(panel);
+        }
+
 
         private void CreateFilterCheckBoxes(string category)
         {
@@ -201,14 +265,28 @@ namespace AccountingBook.Views
             FlowLayoutPanel panel = new FlowLayoutPanel();
             panel.Name = category;
             panel.Width = flowLayoutPanel2.Width;
-            panel.Height = 30;
+            panel.Height = 35;
             panel.FlowDirection = FlowDirection.LeftToRight;
             panel.BorderStyle = BorderStyle.FixedSingle;
+
+            CheckBox selectAllCheckBox = new CheckBox();
+            selectAllCheckBox.Text = "全選";
+            selectAllCheckBox.AutoSize = true;
+            selectAllCheckBox.Tag = false;
+
+            selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
+            panel.Controls.Add(selectAllCheckBox);
+
+
             foreach (string item in items)
             {
                 CheckBox checkBox = new CheckBox();
                 checkBox.Text = item;
                 checkBox.AutoSize = true;
+                checkBox.Tag = false;
+
+                checkBox.CheckedChanged += DetailCheckBox_CheckedChanged;
+
 
                 panel.Controls.Add(checkBox);
             }
@@ -216,6 +294,105 @@ namespace AccountingBook.Views
 
         }
 
+        private void SelectAllCheckBox_CheckedChange(object sender, EventArgs e)
+        {
+
+
+            CheckBox selectAllCheckBox = (CheckBox)sender;
+            if ((bool)selectAllCheckBox.Tag)
+            {
+                return;
+            }
+            for (int i = 0; i < flowLayoutPanel2.Controls.Count; i++)
+            {
+                FlowLayoutPanel panel = (FlowLayoutPanel)flowLayoutPanel2.Controls[i];
+                bool isThisPanel = false;
+
+                for (int j = 0; j < panel.Controls.Count; j++)
+                {
+                    if (panel.Controls[j] == selectAllCheckBox)
+                    {
+                        isThisPanel = true;
+                        break;
+                    }
+                }
+
+                if (isThisPanel)
+                {
+                    for (int j = 0; j < panel.Controls.Count; j++)
+                    {
+                        CheckBox checkBox = (CheckBox)panel.Controls[j];
+                        if (checkBox.Text != "全選")
+                        {
+                            checkBox.Tag = true;
+                            checkBox.Checked = selectAllCheckBox.Checked;
+                            checkBox.Tag = false;
+                        }
+                    }
+                    break;
+                }
+
+            }
+
+        }
+        private void DetailCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
+            CheckBox detailCheckBox = (CheckBox)sender;
+            if ((bool)detailCheckBox.Tag)
+            {
+                return;
+            }
+
+            for (int i = 0; i < flowLayoutPanel2.Controls.Count; i++)
+            {
+                FlowLayoutPanel panel = (FlowLayoutPanel)flowLayoutPanel2.Controls[i];
+                bool isThisPanel = false;
+
+                for (int j = 0; j < panel.Controls.Count; j++)
+                {
+                    if (panel.Controls[j] == detailCheckBox)
+                    {
+                        isThisPanel = true;
+                        break;
+                    }
+                }
+
+                if (isThisPanel)
+                {
+                    bool allChecked = true;
+                    for (int j = 0; j < panel.Controls.Count; j++)
+                    {
+                        CheckBox checkBox = (CheckBox)panel.Controls[j];
+                        if (checkBox.Text != "全選" && checkBox.Checked == false)
+                        {
+                            allChecked = false;
+                            break;
+
+                        }
+                    }
+
+
+                    for (int j = 0; j < panel.Controls.Count; j++)
+                    {
+                        CheckBox checkBox = (CheckBox)panel.Controls[j];
+                        if (checkBox.Text == "全選")
+                        {
+                            checkBox.Tag = true;
+
+                            checkBox.Checked = allChecked;
+
+                            checkBox.Tag = false;
+                            break;
+
+                        }
+                    }
+                    break;
+
+                }
+
+            }
+        }
 
 
     }
