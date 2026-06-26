@@ -63,6 +63,7 @@
     <Compile Include="Contracts\AddRecordContract.cs" />
     <Compile Include="Contracts\AnalysisRecordContract.cs" />
     <Compile Include="Contracts\SearchRecordContract.cs" />
+    <Compile Include="Extensions\CheckBoxExtension.cs" />
     <Compile Include="Models\DTO\RecordModelDTO.cs" />
     <Compile Include="Models\DTO\SearchRecordModelDTO.cs" />
     <Compile Include="Presenters\AnalysisPresenter.cs" />
