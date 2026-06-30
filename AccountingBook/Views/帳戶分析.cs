@@ -54,9 +54,68 @@ namespace AccountingBook.Views
             //CreateFilterCheckBoxes("對象", presenter.GetTargets());
             //CreateFilterCheckBoxes("支付方式", presenter.GetPayments());
 
-            flowLayoutPanel1.GroupCheckBoxGenerated(presenter);
-            flowLayoutPanel2.CheckBoxGenerated();
+            flowLayoutPanel1.GroupCheckBoxGenerated(presenter, OnGroupCheckedChanged);
+            flowLayoutPanel2.CheckBoxGenerated(OnFilterCheckedChanged);
 
+        }
+
+        //0627HW: presenter篩選
+
+        private void OnGroupCheckedChanged(object sender, EventArgs e)
+        {
+
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox.Checked)
+            {
+                groups.Add(checkBox.Text);
+            }
+            else
+            {
+                groups.Remove(checkBox.Text);
+            }
+            Console.WriteLine(checkBox.Text);
+
+        }
+        private void OnFilterCheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            string category = "";
+
+            for (int i = 0; i < flowLayoutPanel2.Controls.Count; i++)
+            {
+                FlowLayoutPanel panel = (FlowLayoutPanel)flowLayoutPanel2.Controls[i];
+                for (int j = 0; j < panel.Controls.Count; j++)
+                {
+                    if (panel.Controls[j] == checkBox)
+                    {
+                        category = panel.Name;
+                        break;
+                    }
+                }
+                if (category != "")
+                {
+                    break;
+                }
+            }
+            if (filters.ContainsKey(category) == false)
+            {
+                filters.Add(category, new List<string>());
+            }
+            if (checkBox.Checked)
+            {
+
+                filters[category].Add(checkBox.Text);
+
+            }
+            else
+            {
+                filters[category].Remove(checkBox.Text);
+            }
+
+
+
+
+            Console.WriteLine(checkBox.Text);
         }
 
 

@@ -14,9 +14,13 @@ namespace AccountingBook.Extensions
         static AnalysisPresenter analysisPresenter;
         static FlowLayoutPanel flowLayoutPanel1;
         static FlowLayoutPanel flowLayoutPanel2;
-        public static void GroupCheckBoxGenerated(this FlowLayoutPanel groupPanel, AnalysisPresenter analysisPresenter)
+        static EventHandler groupCheckBoxGenerated;
+        static EventHandler filterCheckedChanged;
+
+        public static void GroupCheckBoxGenerated(this FlowLayoutPanel groupPanel, AnalysisPresenter analysisPresenter, EventHandler checkedChanged)
         {
             CheckBoxExtension.analysisPresenter = analysisPresenter;
+            CheckBoxExtension.groupCheckBoxGenerated = checkedChanged;
             flowLayoutPanel1 = groupPanel;
             groupPanel.Controls.Clear();
             string[] groups =
@@ -36,14 +40,17 @@ namespace AccountingBook.Extensions
                 checkBox.Width = 75;
 
                 checkBox.CheckedChanged += GroupCheckBox_CheckedChanged;
+                checkBox.CheckedChanged += checkedChanged;
+
                 panel.Controls.Add(checkBox);
             }
             groupPanel.Controls.Add(panel);
         }
 
-        public static void CheckBoxGenerated(this FlowLayoutPanel filterPanel)
+        public static void CheckBoxGenerated(this FlowLayoutPanel filterPanel, EventHandler checkedChanged)
         {
             flowLayoutPanel2 = filterPanel;
+            filterCheckedChanged = checkedChanged;
             flowLayoutPanel2.Controls.Clear();
 
             CreateFilterCheckBoxes("對象", analysisPresenter.GetTargets());
@@ -73,38 +80,7 @@ namespace AccountingBook.Extensions
 
                 }
             }
-            else if (groupCheckBbox.Text == "對象")
-            {
-                if (groupCheckBbox.Checked)
-                {
-                    CreateGroupCheckBoxes("對象", analysisPresenter.GetTargets());
-                }
-                else
-                {
-                    ClearGroupCheckBoxes("對象");
-                    flowLayoutPanel2.Controls.Clear();
-                    CreateFilterCheckBoxes("對象", analysisPresenter.GetTargets());
-                    CreateFilterCheckBoxes("支付方式", analysisPresenter.GetPayments());
 
-
-                }
-            }
-            else if (groupCheckBbox.Text == "支付方式")
-            {
-                if (groupCheckBbox.Checked)
-                {
-                    CreateGroupCheckBoxes("支付方式", analysisPresenter.GetPayments());
-                }
-                else
-                {
-                    ClearGroupCheckBoxes("支付方式");
-                    flowLayoutPanel2.Controls.Clear();
-                    CreateFilterCheckBoxes("對象", analysisPresenter.GetTargets());
-                    CreateFilterCheckBoxes("支付方式", analysisPresenter.GetPayments());
-
-
-                }
-            }
 
 
         }
@@ -120,12 +96,12 @@ namespace AccountingBook.Extensions
             panel.BorderStyle = BorderStyle.FixedSingle;
 
 
-            CheckBox selectAllCheckBox = new CheckBox();
-            selectAllCheckBox.Text = "全選";
-            selectAllCheckBox.AutoSize = true;
-            selectAllCheckBox.Tag = false;
-            selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
-            panel.Controls.Add(selectAllCheckBox);
+            //CheckBox selectAllCheckBox = new CheckBox();
+            //selectAllCheckBox.Text = "全選";
+            //selectAllCheckBox.AutoSize = true;
+            //selectAllCheckBox.Tag = false;
+            //selectAllCheckBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
+            //panel.Controls.Add(selectAllCheckBox);
 
             foreach (string item in items)
             {
@@ -138,6 +114,7 @@ namespace AccountingBook.Extensions
                     checkBox.CheckedChanged += TypeCategoryCheckBox_CheckedChanged;
                 }
                 checkBox.CheckedChanged += SelectAllCheckBox_CheckedChange;
+                //checkBox.CheckedChanged += filterCheckedChanged;
                 panel.Controls.Add(checkBox);
             }
             flowLayoutPanel1.Controls.Add(panel);
@@ -224,6 +201,7 @@ namespace AccountingBook.Extensions
 
                 checkBox.CheckedChanged += DetailCheckBox_CheckedChanged;
 
+                checkBox.CheckedChanged += filterCheckedChanged;
 
                 panel.Controls.Add(checkBox);
             }
@@ -266,6 +244,7 @@ namespace AccountingBook.Extensions
                 checkBox.Tag = false;
 
                 checkBox.CheckedChanged += DetailCheckBox_CheckedChanged;
+                checkBox.CheckedChanged += filterCheckedChanged;
 
 
                 panel.Controls.Add(checkBox);
