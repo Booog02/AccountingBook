@@ -7,7 +7,9 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using static AccountingBook.Contracts.AnalysisRecordContract;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace AccountingBook.Presenters
 {
@@ -24,11 +26,35 @@ namespace AccountingBook.Presenters
             this.dropDownRepository = new DropdownRepository();
         }
 
-        public void SearchRecords(DateTime startDate, DateTime endDate)
+        public void SearchRecords(DateTime startDate, DateTime endDate, List<string> groups, Dictionary<string, List<string>> filters)
         {
             List<RecordModelDAO> dAOs = recordRepository.GetRecordsByDateRange(startDate, endDate);
+            List<string> categories = GetCategories();
+            List<string> selectedDetails = new List<string>();
 
+            foreach (string category in categories)
+            {
+                if (filters.ContainsKey(category))
+                {
+                    selectedDetails.AddRange(filters[category]);
 
+                }
+            }
+            if (selectedDetails.Count > 0)
+            {
+                dAOs = dAOs.Where(x => selectedDetails.Contains(x.Detail)).ToList();
+            }
+
+            if (filters.ContainsKey("對象"))
+            {
+                List<string> targets = filters["對象"];
+                dAOs = dAOs.Where(x => targets.Contains(x.Target)).ToList();
+            }
+            if (filters.ContainsKey("支付方式"))
+            {
+                List<string> payments = filters["支付方式"];
+                dAOs = dAOs.Where(x => payments.Contains(x.Payment)).ToList();
+            }
             view.ShowRecords(dAOs);
         }
 
@@ -48,5 +74,7 @@ namespace AccountingBook.Presenters
         {
             return dropDownRepository.GetPayments();
         }
+
+
     }
 }

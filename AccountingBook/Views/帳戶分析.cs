@@ -35,6 +35,7 @@ namespace AccountingBook.Views
 
         void IAnalysisRecordView.ShowRecords(List<RecordModelDAO> dAOs)
         {
+
             dataGridView1.DataSource = dAOs;
         }
 
@@ -42,8 +43,7 @@ namespace AccountingBook.Views
         {
             this.Debounce(() =>
             {
-
-                presenter.SearchRecords(startDateTimePicker.Value.Date, endDateTimePicker.Value.Date);
+                presenter.SearchRecords(startDateTimePicker.Value.Date, endDateTimePicker.Value.Date, groups, filters);
 
             }, 400);
         }
@@ -60,18 +60,33 @@ namespace AccountingBook.Views
         }
 
         //0627HW: presenter篩選
+        //0630HW: 修好 篩選條件
 
         private void OnGroupCheckedChanged(object sender, EventArgs e)
         {
 
             CheckBox checkBox = sender as CheckBox;
+            if (checkBox == null)
+            {
+                return;
+            }
             if (checkBox.Checked)
             {
-                groups.Add(checkBox.Text);
+                if (groups.Contains(checkBox.Text) == false)
+                {
+                    groups.Add(checkBox.Text);
+
+                }
             }
             else
             {
                 groups.Remove(checkBox.Text);
+                if (filters.ContainsKey(checkBox.Text))
+                {
+                    filters.Remove(checkBox.Text);
+
+                }
+
             }
             Console.WriteLine(checkBox.Text);
 
@@ -80,6 +95,14 @@ namespace AccountingBook.Views
         {
             CheckBox checkBox = sender as CheckBox;
             string category = "";
+            if (checkBox == null)
+            {
+                return;
+            }
+            if (checkBox.Text == "全選")
+            {
+                return;
+            }
 
             for (int i = 0; i < flowLayoutPanel2.Controls.Count; i++)
             {
@@ -97,19 +120,36 @@ namespace AccountingBook.Views
                     break;
                 }
             }
-            if (filters.ContainsKey(category) == false)
+            if (category == "")
             {
-                filters.Add(category, new List<string>());
+                return;
             }
+
+
             if (checkBox.Checked)
             {
-
-                filters[category].Add(checkBox.Text);
+                if (filters.ContainsKey(category) == false)
+                {
+                    filters.Add(category, new List<string>());
+                }
+                if (filters[category].Contains(checkBox.Text) == false)
+                {
+                    filters[category].Add(checkBox.Text);
+                }
 
             }
             else
             {
-                filters[category].Remove(checkBox.Text);
+
+                if (filters.ContainsKey(category))
+                {
+                    filters[category].Remove(checkBox.Text);
+                }
+                if (filters[category].Count == 0)
+                {
+                    filters.Remove(category);
+                }
+
             }
 
 

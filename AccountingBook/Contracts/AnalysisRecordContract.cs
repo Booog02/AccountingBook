@@ -18,7 +18,7 @@ namespace AccountingBook.Contracts
 
         public interface IAnalysisRecordPresenter
         {
-            void SearchRecords(DateTime startDate, DateTime endDate);
+            void SearchRecords(DateTime startDate, DateTime endDate, List<string> groups, Dictionary<string, List<string>> filters);
         }
 
     }

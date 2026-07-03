@@ -249,8 +249,10 @@ namespace AccountingBook.Extensions
 
                 panel.Controls.Add(checkBox);
             }
-            flowLayoutPanel2.Controls.Add(panel);
 
+            flowLayoutPanel2.Controls.Add(panel);
+            Application.DoEvents();
+            selectAllCheckBox.Checked = true;
         }
 
         private static void SelectAllCheckBox_CheckedChange(object sender, EventArgs e)
